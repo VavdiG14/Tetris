@@ -2,6 +2,7 @@
 
 from tkinter import*
 from tabelakock import kocka
+import time
 #definiramo širino kvadratka, ki nam bo služil kot merilo za velikost elementov.
 k = 30
 zacetekx=k*15/2
@@ -20,18 +21,44 @@ class GUI():
         master.config(menu=menu)
         f = Frame(master)
         f.pack()
-        GUI.risanjekock(self,"kvadrat")
+        GUI.risanjekock(self, "kvadrat")
+        GUI.padanje_kocke(self, 3)
+
+
     def risanjekock(self,vrstakocke):
         koord= kocka(vrstakocke).koordnidate
-        print(koord)
-        kor1=list(map(lambda x: x*k,koord[0]))
-        kor2=list(map(lambda x: x*k,koord[1]))
-        kor3=list(map(lambda x: x*k,koord[2]))
-        kor4=list(map(lambda x: x*k,koord[3]))
-        koc1 = self.platno.create_rectangle(zacetekx + kor1[0], zaceteky + kor1[1], zacetekx + kor1[0] + k,zaceteky + kor1[1] + k, fill = 'pink')
-        koc2 = self.platno.create_rectangle(zacetekx + kor2[0], zaceteky + kor2[1], zacetekx + kor2[0] + k,zaceteky + kor2[1] + k, fill = 'pink')
-        koc3 = self.platno.create_rectangle(zacetekx + kor3[0], zaceteky + kor3[1], zacetekx + kor3[0] + k,zaceteky + kor3[1] + k, fill = 'pink')
-        koc4 = self.platno.create_rectangle(zacetekx + kor4[0], zaceteky + kor4[1], zacetekx + kor4[0] + k,zaceteky + kor4[1] + k, fill = 'pink')
+        kor1=list(map(lambda x: x * k, koord[0]))
+        kor2=list(map(lambda x: x * k, koord[1]))
+        kor3=list(map(lambda x: x * k, koord[2]))
+        kor4=list(map(lambda x: x * k, koord[3]))
+        self.koc1 = self.platno.create_rectangle(zacetekx + kor1[0], zaceteky + kor1[1], zacetekx + kor1[0] + k,zaceteky + kor1[1] + k, fill = 'pink')
+        self.koc2 = self.platno.create_rectangle(zacetekx + kor2[0], zaceteky + kor2[1], zacetekx + kor2[0] + k,zaceteky + kor2[1] + k, fill = 'pink')
+        self.koc3 = self.platno.create_rectangle(zacetekx + kor3[0], zaceteky + kor3[1], zacetekx + kor3[0] + k,zaceteky + kor3[1] + k, fill = 'pink')
+        self.koc4 = self.platno.create_rectangle(zacetekx + kor4[0], zaceteky + kor4[1], zacetekx + kor4[0] + k,zaceteky + kor4[1] + k, fill = 'pink')
+        self.platno.update()
+    def padanje_kocke(self,level):
+        t=18
+        while t:
+            self.platno.after(1000)
+            self.platno.move(self.koc1, 0, k)
+            self.platno.move(self.koc2, 0, k)
+            self.platno.move(self.koc3, 0, k)
+            self.platno.move(self.koc4, 0, k)
+            self.platno.update()
+            t-=1
+    def premikvlevo(self):
+        self.platno.move(self.koc1, -k, 0)
+        self.platno.move(self.koc2, -k, 0)
+        self.platno.move(self.koc3, -k, 0)
+        self.platno.move(self.koc4, -k, 0)
+        self.platno.update()
+    def premikvdesno(self):
+        self.platno.move(self.koc1, k, 0)
+        self.platno.move(self.koc2, k, 0)
+        self.platno.move(self.koc3, k, 0)
+        self.platno.move(self.koc4, k, 0)
+        self.platno.update()
+
 
 
 
