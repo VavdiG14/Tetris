@@ -10,33 +10,36 @@ zaceteky=0
 dno = 17
 vse_kocke=kocke.keys()
 
-class Objekt():
+class Lik():
     '''V nadaljevanju naj bi bil to class Objekt s katerim bi
      premikali in
     rotirali dani objekt..'''
 
-    def __init__(self, igrica,vrsta):
-        self.dno = dno
+    def __init__(self, igrica,imeLika):
+        self.oblika = [kocke[imeLika]]#dobi seznam vseh oblik lika
+        self.rotacija = 0   #privzeta trenutna rotacija
+        self.gids = []
         self.igrica = igrica
-        self.risanjeKock(vrsta)
-        self.padanje_kocke()
-        self.igrica.platno.update()
+        self.narisiLik()
         self.igrica.platno.bind("<Left>", self.premikvLevo)
         self.igrica.platno.bind("<Right>", self.premikvDesno)
+        self.igrica.platno.bind("<space>", self.rotiraj)
 
+    def narisiLik(self):
+        for (x,y) in self.oblika[self.rotacija%len(self.oblika)]:
+            id = self.igrica.platno.create_rectangle(
+                zacetekx +(x * k), zaceteky +(y*k), zacetekx +(x+1)*k, zaceteky + (y+1) * k, fill ='pink')
+        self.gids.append(id)
 
-    def risanjeKock(self,vrstakocke):
-        '''Izriše Objekt na platno.'''
-        koord= Kocka(vrstakocke).koordnidate
-        kor1=list(map(lambda x: x * k, koord[0]))
-        kor2=list(map(lambda x: x * k, koord[1]))
-        kor3=list(map(lambda x: x * k, koord[2]))
-        kor4=list(map(lambda x: x * k, koord[3]))
-        self.koc1 = self.igrica.platno.create_rectangle(zacetekx + kor1[0], zaceteky + kor1[1], zacetekx + kor1[0] + k,zaceteky + kor1[1] + k, fill = 'pink')
-        self.koc2 = self.igrica.platno.create_rectangle(zacetekx + kor2[0], zaceteky + kor2[1], zacetekx + kor2[0] + k,zaceteky + kor2[1] + k, fill = 'pink')
-        self.koc3 = self.igrica.platno.create_rectangle(zacetekx + kor3[0], zaceteky + kor3[1], zacetekx + kor3[0] + k,zaceteky + kor3[1] + k, fill = 'pink')
-        self.koc4 = self.igrica.platno.create_rectangle(zacetekx + kor4[0], zaceteky + kor4[1], zacetekx + kor4[0] + k,zaceteky + kor4[1] + k, fill = 'pink')
-        self.igrica.platno.update()
+    def osvezi(self):
+        pass
+
+    def rotiraj(self, events):
+        self.rotacija += 1
+        self.narisiLik()
+        #Preveri, ali se ga da narisati, glede na druge postavitve
+        self.osvezi()
+
 
     def padanje_kocke(self,level = 3):
         '''Kocka se spušča proti dnu'''
@@ -82,7 +85,7 @@ class GUI():
         menu = Menu(master)
         master.config(menu=menu)
         self.platno.focus_set()
-        self.kocka = Objekt(self,'palcka')
+        self.kocka = Lik(self,'palcka')
 
 
 
