@@ -10,7 +10,7 @@ zaceteky=0
 dno = 17
 vse_kocke=kocke.keys()
 
-class Objekt():
+class Lik():
     '''V nadaljevanju naj bi bil to class Objekt s katerim bi
      premikali in
     rotirali dani objekt..'''
@@ -82,7 +82,7 @@ class GUI():
         menu = Menu(master)
         master.config(menu=menu)
         self.platno.focus_set()
-        self.kocka = Objekt(self,'palcka')
+        self.kocka = Lik(self,'palcka')
 
 
 
