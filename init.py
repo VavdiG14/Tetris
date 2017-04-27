@@ -1,10 +1,10 @@
 ###Uvod v programiranje igrice Tetris
+# -*- coding: "utf-8" -*-
 
 from tkinter import*
 from tabelakock import*
 import random
 from tkinter import messagebox
-
 #definiramo širino kvadratka, ki nam bo služil kot merilo za velikost elementov.
 k = 30
 zacetekx=7
@@ -30,16 +30,19 @@ class Lik():
         self.igrica.platno.bind("<Left>", self.premikvLevo)
         self.igrica.platno.bind("<Right>", self.premikvDesno)
         self.igrica.platno.bind("<space>", self.rotiranje)
+        self.igrica.platno.bind("<Up>",self.rotiranje)
         self.padanje_kocke()
 
     def narisiLik(self):
         if self.koord[0][7] is not None:
             messagebox.showinfo("Koncaj igro", "This is a Test")
+
         else:
             for (u,v) in self.oblika[self.rotacija % len(self.oblika)]:
                 id = self.igrica.platno.create_rectangle(
                     self.x * k +(u * k), self.y*k +(v*k), self.x*k +(u+1)*k, self.y* k + (v+1) * k, fill = self.barva)
                 self.gids.append(id)
+            self.igrica.platno.update()
 
 
 
@@ -52,15 +55,19 @@ class Lik():
                     self.igrica.platno.coords(self.gids[i], self.x*k +(u * k), self.y*k +(v*k), self.x*k +(u+1)*k,
                                               self.y*k + (v+1) * k)
                     i += 1
+            self.igrica.platno.update()
 
-    def padanje_kocke(self,level = 3):
+    def padanje_kocke(self):
         '''Kocka se spušča proti dnu'''
-        self.igrica.platno.update()
+        hitr = [1000, 600, 500, 400, 350, 300, 250, 225, 200, 190, 180, 170, 160, 150, 140, 130, 120,
+                110, 100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5]
+        hitrost=hitr[self.igrica.level]
         if self.preveriPremik(self.rotacija, self.x, self.y+1):
+            self.igrica.platno.update()
             for i in self.gids:
                 self.igrica.platno.move(i, 0, k)
             self.y += 1
-            self.igrica.platno.after(250, self.padanje_kocke)
+            self.igrica.platno.after(hitrost, self.padanje_kocke)
         else:
             self.osveziTabelo(self.rotacija, self.x, self.y)
             self.igrica.naslednjiLik(self.koord)
@@ -79,7 +86,6 @@ class Lik():
             for u in self.gids:
                 self.igrica.platno.move(u, k, 0)
             self.x += 1
-
         self.igrica.platno.update()
 
     def preveriPremik(self,orientacija, x,y):
@@ -98,6 +104,7 @@ class Lik():
         return True
 
     def osveziTabelo(self,orientacija, x,y):
+        print(self.koord)
         i = 0
         for (u, v) in self.oblika[orientacija]:
             novX = u + x
@@ -116,7 +123,13 @@ class Lik():
                 vrstice.append(vrstica)
         for vrst in vrstice:
             self.koord.remove(vrst)
-            self.koord = [[None for i in range(16)]]+ self.koord
+            self.koord = [[None for i in range(15)]] + self.koord
+            self.igrica.tocke+=1
+            if self.igrica.tocke>0 and self.igrica.tocke%5==0:
+                self.igrica.level+=1
+        self.igrica.platno.itemconfigure(self.igrica.tekstlevel, text= "Level: "+str(self.igrica.level))
+        self.igrica.platno.itemconfigure(self.igrica.teksttocke, text= "Tocke: "+str(self.igrica.tocke))
+
 
 
 
@@ -126,21 +139,32 @@ class GUI():
     def __init__(self, master):
         self.platno = Canvas(master, width=15*k, height=20*k, background='black')
         self.platno.pack(side=RIGHT)
+        self.tocke=0
+        self.level=1
         menu = Menu(master)
         master.config(menu=menu)
         menu.add_command(label="Nova igra", command=self.novaIgra)
         menu.add_command(label="Koncaj", command=master.destroy)
         self.platno.focus_set()
+        self.igra = False
 
 
 
     def naslednjiLik(self,koord=[[None for i in range(15)] for j in range(20)]):
-        barve = ['green', 'blue', 'red', 'pink']
+        barve = ['green', 'blue', 'red', 'pink',"yellow","purple","orange","violet",'cyan','aqua','palegreen']
         nakljucnaBarva = random.choice(barve)
-        return Lik(self, random.choice(vse_kocke), nakljucnaBarva,koord)
+        return Lik(self, random.choice(vse_kocke), nakljucnaBarva,koord,)
 
     def novaIgra(self):
-        self.kocka = self.naslednjiLik()
+        if self.igra:
+            messagebox.Message("Igra je v teku")
+
+        else:
+            self.igra = not self.igra
+            self.teksttocke=self.platno.create_text(30,10,text=("Tocke: 0").encode('utf8'), fill="White")
+            self.tekstlevel=self.platno.create_text(k*15-30, 10,font=('Helvetica',36,'bold'),text="level: 1",fill="white" )
+            self.kocka = self.naslednjiLik()
+
 
 
 root = Tk()
