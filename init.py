@@ -164,6 +164,9 @@ class GUI():
             self.teksttocke=self.platno.create_text(30,10,text=("Tocke: 0").encode('utf8'), fill="White")
             self.tekstlevel=self.platno.create_text(k*15-30, 10,font=('Helvetica',36,'bold'),text="level: 1",fill="white" )
             self.kocka = self.naslednjiLik()
+    def koncajIgro(self):
+        '''TODO:napiši konec igre'''
+        return None
 
 
 
