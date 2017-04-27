@@ -2,7 +2,6 @@
 # -*- coding: "utf-8" -*-
 
 from tkinter import*
-from tabelakock import*
 import random
 from tkinter import messagebox
 
@@ -131,7 +130,6 @@ class Lik():
         return True
 
     def osveziTabelo(self,orientacija, x,y):
-        print(self.koord)
         i = 0
         for (u, v) in self.oblika[orientacija]:
             novX = u + x
@@ -210,15 +208,18 @@ class GUI():
             self.master.destroy()
 
     def navodila(self):
-        okno = Toplevel()
-        okno.minsize(width=200, height=250)
-        okno.title('Navodila')
-        #okno.resizable(width=False, height=False)
-        canvas = Canvas(okno, width=806, height=537)
-        canvas.pack()
-        canvas.focus_set()
-        img = PhotoImage(file='navodila.gif')
-        canvas.create_image(806, 537, image=img)
+        messagebox.showinfo("Navodila", "Kocke postavljajte eno na drugo. Ko dopolnite vrstico, se vrstica izbriše in s tem dobite točko."
+                                        "Za vsakih 5 točk pridobite level in kocke padajo hitreje. Kocke premikate levo in desno s puščicami. Puščica gor obrne lik, puščica dol, pa pospeši lik. ")
+
+        # okno = Toplevel()
+        # okno.minsize(width=200, height=250)
+        # okno.title('Navodila')
+        # #okno.resizable(width=False, height=False)
+        # canvas = Canvas(okno, width=806, height=537)
+        # canvas.pack()
+        # canvas.focus_set()
+        # img = PhotoImage(file='navodila.gif')
+        # canvas.create_image(806, 537, image=img)
 
 root = Tk()
 app=GUI(root)
