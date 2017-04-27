@@ -104,6 +104,7 @@ class Lik():
             novY = v + y
             (self.koord[novY])[novX] = self.gids[i]
             i += 1
+        vrstice=[]
         for st,vrstica in enumerate(self.koord):
             if None not in vrstica:
                 for gid in vrstica:
@@ -112,8 +113,10 @@ class Lik():
                     for gid in self.koord[st2]:
                             if gid is not None:
                                 self.igrica.platno.move(gid, 0, k)
-                self.koord.remove(vrstica)
-                self.koord = [[None for i in range(16)]]+ self.koord
+                vrstice.append(vrstica)
+        for vrst in vrstice:
+            self.koord.remove(vrst)
+            self.koord = [[None for i in range(16)]]+ self.koord
 
 
 
