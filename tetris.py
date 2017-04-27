@@ -5,19 +5,31 @@ from tkinter import*
 from tabelakock import*
 import random
 from tkinter import messagebox
-#definiramo širino kvadratka, ki nam bo služil kot merilo za velikost elementov.
-k = 30
-zacetekx=7
-zaceteky=0
-dno = 17
-vse_kocke=list(kocke.keys())
+
+k = 30      #definiramo širino kvadratka, ki nam bo služil kot merilo za velikost elementov.
+
+
+liki = {"leviL": [[(-1, 1), (0, 0), (0, -1), (0, 1)], [(-1, -1), (0, 0), (1, 0), (-1, 0)], [(1, -1), (0, 0), (0, 1), (0, -1)], [(1, 1), (0, 0), (-1, 0), (1, 0)]],
+         "desniL": [[(0, 0), (1, 1), (0, -1), (0, 1)], [(0, 0), (-1, 1), (1, 0), (-1, 0)], [(0, 0), (-1, -1), (0, 1), (0, -1)], [(0, 0), (1, -1), (-1, 0), (1, 0)]],
+         "kvadrat": [[(0, 0), (0, 1), (-1, 0), (-1, 1)]],
+         "kockaT": [[(0, 0), (-1, 0), (1, 0), (0, -1)], [(0, 0), (0, -1), (0, 1), (1, 0)], [(0, 0), (1, 0), (-1, 0), (0, 1)], [(0, 0), (0, 1), (0, -1), (-1, 0)]],
+         "palcka": [[(1, 0), (0, 0), (-1, 0), (-2, 0)],[(0, 1), (0, 0), (0, -1), (0, -2)]],
+         "leviZ": [[(-1, -1), (0, -1), (0, 0), (1, 0)], [(1, -1), (1, 0), (0, 0), (0, 1)], [(1, 1), (0, 1), (0, 0), (-1, 0)], [(-1, 1), (-1, 0), (0, 0), (0, -1)]],
+         "desniD": [[(1, -1), (0, -1), (0, 0), (-1, 0)], [(1, 1), (1, 0), (0, 0), (0, -1)], [(-1, 1), (0, 1), (0, 0), (1, 0)], [(-1, -1), (-1, 0), (0, 0), (0, 1)]]}
+#tabela kock in njihovih rotacij
+
+zacetekx = 7
+zaceteky = 0
+
+vsi_liki = list(liki.keys())
+
 
 class Lik():
     '''Razreed v katerem rišemo like, jih premikamo in rotiramo..'''
 
     def __init__(self, igrica,imeLika,barva,koord):
         self.barva = barva
-        self.oblika = kocke[imeLika]#dobi seznam vseh oblik lika
+        self.oblika = liki[imeLika]#dobi seznam vseh oblik lika
         self.rotacija = 0   #privzeta trenutna rotacija
         self.x = zacetekx
         self.y = zaceteky
@@ -172,7 +184,7 @@ class GUI():
     def naslednjiLik(self,koord=[[None for i in range(15)] for j in range(20)]):
         barve = ['green', 'blue', 'red', 'pink',"yellow","purple","orange","violet",'cyan','aqua','palegreen']
         nakljucnaBarva = random.choice(barve)
-        return Lik(self, random.choice(vse_kocke), nakljucnaBarva,koord,)
+        return Lik(self, random.choice(vsi_liki), nakljucnaBarva,koord,)
 
     def novaIgra(self):
         if self.igra:
