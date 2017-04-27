@@ -6,10 +6,10 @@ import random
 from tkinter import messagebox
 
 #definiramo širino kvadratka, ki nam bo služil kot merilo za velikost elementov.
+
 k = 30
 zacetekx=7
 zaceteky=0
-dno = 17
 vse_kocke=list(kocke.keys())
 
 class Lik():
@@ -34,7 +34,7 @@ class Lik():
 
     def narisiLik(self):
         if self.koord[0][7] is not None:
-            messagebox.showinfo("Koncaj igro", "This is a Test")
+            pass
         else:
             for (u,v) in self.oblika[self.rotacija % len(self.oblika)]:
                 id = self.igrica.platno.create_rectangle(
@@ -113,7 +113,7 @@ class Lik():
                             if gid is not None:
                                 self.igrica.platno.move(gid, 0, k)
                 self.koord.remove(vrstica)
-                self.koord = [[None for i in range(16)]]+ self.koord
+                self.koord = [[None for i in range(16)]] + self.koord
 
 
 
@@ -127,6 +127,7 @@ class GUI():
         master.config(menu=menu)
         menu.add_command(label="Nova igra", command=self.novaIgra)
         menu.add_command(label="Koncaj", command=master.destroy)
+        self.tocke = 0
         self.platno.focus_set()
 
 
@@ -137,7 +138,8 @@ class GUI():
         return Lik(self, random.choice(vse_kocke), nakljucnaBarva,koord)
 
     def novaIgra(self):
-        self.kocka = self.naslednjiLik()
+        self.tocke = 0
+        self.kocka = self.naslednjiLik([[None for i in range(15)] for j in range(20)])
 
 
 root = Tk()
