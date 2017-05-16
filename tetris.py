@@ -2,7 +2,6 @@
 # -*- coding: "utf-8" -*-
 
 from tkinter import*
-from tabelakock import*
 import random
 from tkinter import messagebox
 
@@ -35,6 +34,7 @@ class Lik():
         self.y = zaceteky
         self.koord = koord
         self.gids = []
+        self.padanjeId = None
         self.igrica = igrica
         self.narisiLik()
         self.igrica.platno.bind("<Left>", self.premikvLevo)
@@ -46,18 +46,11 @@ class Lik():
 
     def narisiLik(self):
         '''Metoda izriše trenutni lik'''
-        if self.koord[0][7] is not None:
-                result = messagebox.askquestion("Konec igre", "Želite igrati ponovno?", icon='warning')
-                if result == 'no':
-                    self.igrica.koncajIgro()
-                else:
-                    self.igrica.ponovnaIgra()
-        else:
-            for (u,v) in self.oblika[self.rotacija % len(self.oblika)]:
-                id = self.igrica.platno.create_rectangle(
-                    self.x * k +(u * k), self.y*k +(v*k), self.x*k +(u+1)*k, self.y* k + (v+1) * k, fill = self.barva)
-                self.gids.append(id)
-            self.igrica.platno.update()
+        for (u,v) in self.oblika[self.rotacija % len(self.oblika)]:
+            id = self.igrica.platno.create_rectangle(
+                self.x * k + (u * k), self.y * k + (v * k), self.x * k +(u+1) * k, self.y * k + (v+1) * k, fill=self.barva)
+            self.gids.append(id)
+        self.igrica.platno.update()
 
 
 
@@ -75,18 +68,33 @@ class Lik():
 
     def padanjeLika(self):
         '''Lik se spušča proti dnu'''
-        tabeleaHitrosti = [700, 600, 500, 400, 350, 300, 250, 225, 200, 190, 180, 170, 160, 150, 140, 130, 120,
+        tabelaHitrosti = [700, 600, 500, 400, 350, 300, 250, 225, 200, 190, 180, 170, 160, 150, 140, 130, 120,
                 110, 100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5]
-        hitrost=tabeleaHitrosti[self.igrica.level]
+        hitrost = tabelaHitrosti[self.igrica.level]
+        print('Padanje lika: ', self.gids, self)
         if self.preveriPremik(self.rotacija, self.x, self.y+1):
             self.igrica.platno.update()
             for i in self.gids:
                 self.igrica.platno.move(i, 0, k)
             self.y += 1
-            self.igrica.platno.after(hitrost, self.padanjeLika)
+            self.padanjeId = self.igrica.platno.after(hitrost, self.padanjeLika)
+
         else:
+            #lik je pristal
             self.osveziTabelo(self.rotacija, self.x, self.y)
-            self.igrica.naslednjiLik(self.koord)
+            if self.koord[0][7] is None:
+                #Nov lik začne padati
+                self.igrica.naslednjiLik(self.koord)
+            else:
+                #Za nov lik ni prostora
+                if self.padanjeId is not None:
+                    self.igrica.platno.after_cancel(self.padanjeId)
+                result = messagebox.askquestion("Konec igre", "Želite igrati ponovno?", icon='warning')
+                if result == 'no':
+                    self.igrica.koncajIgro()
+                else:
+                    return self.igrica.ponovnaIgra()
+
 
     def hitrejeDol(self,event):
         if self.preveriPremik(self.rotacija, self.x, self.y+1):
@@ -126,12 +134,10 @@ class Lik():
             if noviX < 0 or noviX >= 15:        #če se zaleti levo ali desno
                 return False
             if self.koord[noviY][noviX] is not None:
-
                 return False
         return True
 
     def osveziTabelo(self,orientacija, x,y):
-        print(self.koord)
         i = 0
         for (u, v) in self.oblika[orientacija]:
             novX = u + x
@@ -151,11 +157,11 @@ class Lik():
         for vrst in vrstice:
             self.koord.remove(vrst)
             self.koord = [[None for i in range(15)]] + self.koord
-            self.igrica.tocke+=1
-            if self.igrica.tocke>0 and self.igrica.tocke%5==0:
-                self.igrica.level+=1
-        self.igrica.platno.itemconfigure(self.igrica.tekstlevel, text= "Level: "+str(self.igrica.level))
-        self.igrica.platno.itemconfigure(self.igrica.teksttocke, text= "Tocke: "+str(self.igrica.tocke))
+            self.igrica.tocke += 1
+            if self.igrica.tocke > 0 and self.igrica.tocke % 5 == 0:
+                self.igrica.level += 1
+        self.igrica.platno.itemconfigure(self.igrica.tekstlevel, text="Level: "+str(self.igrica.level))
+        self.igrica.platno.itemconfigure(self.igrica.teksttocke, text="Tocke: "+str(self.igrica.tocke))
 
 
 
@@ -166,43 +172,38 @@ class GUI():
     def __init__(self, master):
         self.platno = Canvas(master, width=15*k, height=20*k, background='black')
         self.platno.pack(side=RIGHT)
-        self.tocke=0
-        self.level=1
+        self.tocke = 0
+        self.level = 1
         menu = Menu(master)
         self.master = master
         self.master.resizable(width=False, height=False)
         self.master.title('Tetris')
         master.config(menu=menu)
+        self.platno.focus_set()
         menu.add_command(label="Nova igra", command=self.novaIgra)
         menu.add_command(label="Koncaj", command=self.koncajIgro)
         menu.add_command(label="Navodila", command=self.navodila)
-        self.platno.focus_set()
-        self.igra = False
+        self.lik = None #treutni lik, ki pada
 
 
 
-    def naslednjiLik(self,koord=[[None for i in range(15)] for j in range(20)]):
-        barve = ['green', 'blue', 'red', 'pink',"yellow","purple","orange","violet",'cyan','aqua','palegreen']
+    def naslednjiLik(self,koord):
+        barve = ['green', 'blue', 'red', 'pink', "yellow", "purple", "orange", "violet", 'cyan', 'aqua', 'palegreen']
         nakljucnaBarva = random.choice(barve)
-        return Lik(self, random.choice(vsi_liki), nakljucnaBarva,koord,)
+        self.lik = Lik(self, random.choice(vsi_liki), nakljucnaBarva, koord)
 
     def novaIgra(self):
-        if self.igra:
-            messagebox.Message("Igra je v teku")
-
-        else:
             self.platno.delete(ALL)
             self.tocke = 0
             self.level = 1
-            self.igra = not self.igra
-            self.teksttocke=self.platno.create_text(k*1+40,20, font=('Helvetica',24,'bold'), text=("Tocke: 0").encode('utf8'), fill="White")
-            self.tekstlevel=self.platno.create_text(k*15-70, 20,font=('Helvetica',24,'bold'),text="level: 1",fill="white" )
-            self.kocka = self.naslednjiLik([[None for i in range(15)] for j in range(20)])
+            self.teksttocke=self.platno.create_text(k*1+40,20, font=('Helvetica',24,'bold'), text=("Tocke: 0"), fill="White")
+            self.tekstlevel=self.platno.create_text(k*15-70, 20,font=('Helvetica',24,'bold'),text="level: 1", fill="white" )
+            self.naslednjiLik([[None for i in range(15)] for j in range(20)])
+
 
     def ponovnaIgra(self):
         '''TODO:napiši konec igre'''
-        self.igra = False
-        self.novaIgra()
+        return self.novaIgra()
 
     def koncajIgro(self):
         result = messagebox.askquestion("Končaj igro", "Želite končati igro?", icon='warning')
@@ -213,12 +214,12 @@ class GUI():
         okno = Toplevel()
         okno.minsize(width=200, height=250)
         okno.title('Navodila')
-        #okno.resizable(width=False, height=False)
+        okno.resizable(width=False, height=False)
         canvas = Canvas(okno, width=806, height=537)
         canvas.pack()
         canvas.focus_set()
-        img = PhotoImage(file='navodila.gif')
-        canvas.create_image(806, 537, image=img)
+        self.img = PhotoImage(file='navodila.gif')
+        canvas.create_image(400, 250, image=self.img)
 
 root = Tk()
 app=GUI(root)
