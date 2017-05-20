@@ -53,7 +53,6 @@ class Lik():
         self.igrica.platno.update()
 
 
-
     def rotiranjeLika(self, events):
         '''Rotiranje lika v smeri urinega kazalca'''
         oren = (self.rotacija + 1 )% len(self.oblika)
@@ -71,7 +70,6 @@ class Lik():
         tabelaHitrosti = [700, 600, 500, 400, 350, 300, 250, 225, 200, 190, 180, 170, 160, 150, 140, 130, 120,
                 110, 100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5]
         hitrost = tabelaHitrosti[self.igrica.level]
-        print('Padanje lika: ', self.gids, self)
         if self.preveriPremik(self.rotacija, self.x, self.y+1):
             self.igrica.platno.update()
             for i in self.gids:
@@ -95,6 +93,8 @@ class Lik():
                 else:
                     return self.igrica.ponovnaIgra()
 
+    def ustaviLik(self):
+        self.igrica.platno.after_cancel(self.padanjeId)
 
     def hitrejeDol(self,event):
         if self.preveriPremik(self.rotacija, self.x, self.y+1):
@@ -184,7 +184,7 @@ class GUI():
         menu.add_command(label="Koncaj", command=self.koncajIgro)
         menu.add_command(label="Navodila", command=self.navodila)
         self.lik = None #treutni lik, ki pada
-
+        self.prvaIgra = True
 
 
     def naslednjiLik(self,koord):
@@ -192,7 +192,7 @@ class GUI():
         nakljucnaBarva = random.choice(barve)
         self.lik = Lik(self, random.choice(vsi_liki), nakljucnaBarva, koord)
 
-    def novaIgra(self):
+    def ponastaviIgro(self):
             self.platno.delete(ALL)
             self.tocke = 0
             self.level = 1
@@ -200,9 +200,17 @@ class GUI():
             self.tekstlevel=self.platno.create_text(k*15-70, 20,font=('Helvetica',24,'bold'),text="level: 1", fill="white" )
             self.naslednjiLik([[None for i in range(15)] for j in range(20)])
 
+    def novaIgra(self):
+        if self.prvaIgra:
+            self.prvaIgra = False
+            self.ponastaviIgro()
+        else:
+            Lik.ustaviLik(self.lik)
+            self.lik = None
+            self.ponastaviIgro()
 
     def ponovnaIgra(self):
-        '''TODO:napiši konec igre'''
+        '''Ponovna igra'''
         return self.novaIgra()
 
     def koncajIgro(self):
