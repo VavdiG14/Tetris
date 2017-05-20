@@ -211,7 +211,7 @@ class GUI():
 
     def ponovnaIgra(self):
         '''Ponovna igra'''
-        return self.novaIgra()
+        return self.ponastaviIgro()
 
     def koncajIgro(self):
         result = messagebox.askquestion("Končaj igro", "Želite končati igro?", icon='warning')
